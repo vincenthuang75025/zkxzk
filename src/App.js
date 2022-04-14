@@ -1,24 +1,62 @@
-import logo from './logo.svg';
+import React, { useState } from "react";
 import './App.css';
 
+
+const backend_url = "http://3.101.23.89:3000/";
+
 function App() {
+  const [input, setInput] = useState("");
+  const [id, setId] = useState("");
+  const [proof, setProof] = useState("");
+
+  const handleInputChange = (event) => {
+    setInput(event.target.value);
+  };
+
+  const submitInput = (event) => {
+    if (input !== "") {
+      fetch(backend_url + "generate_proof", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: "{\"in\":" + input + "}",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setId(data.id);
+        });
+    }
+  }
+
+  const submitHash = (event) => {
+    if (id !== "") {
+      fetch(backend_url + "result", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: "{\"id\":\"" + id + "\"}",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setProof(JSON.stringify(data));
+        });
+    }
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <>
+    <div>
+      <h1>Zk Stuff</h1>
+      <div>
+        <input placeholder="BinSub circuit input" type="text" value={input} onChange={handleInputChange}/>
+        <button onClick={submitInput}>Submit Circuit Input</button>
+      </div>
+      <div><button onClick={submitHash}>Submit Hash</button></div>
+      <div>{proof === "" ? "": proof}</div>
     </div>
+    </>
   );
 }
 
