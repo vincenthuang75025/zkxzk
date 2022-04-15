@@ -46,23 +46,32 @@ function App() {
     }
   }
 
+  const copyProof = (event) => {
+    if (proof !== "") {
+      navigator.clipboard.writeText(proof);
+    }
+  }
+
   return (
     <>
     <div className="App">
       <header className="App-header">
         <h1>ZK x ZK</h1>
         <div>
-          <input placeholder="BinSub circuit input" type="text" value={input} onChange={handleInputChange}/>
-          <button onClick={submitInput}>Submit Verification Job</button>
+          <input placeholder="BinSub circuit input" className="App-input" type="text" value={input} onChange={handleInputChange}/>
+          <button onClick={submitInput} className="App-button">Submit Verification Job</button>
         </div>
         <div className="App-div">
           {id === "" ? <div/> : 
           <div className="App-div">
             <div>Your job ID is {id}. Generating the proof may take a few minutes...</div>
-            <button onClick={submitHash}>Check if proof is ready</button>
+            <button onClick={submitHash} className="App-button">Check if proof is ready</button>
           </div>}
         </div>
-        <div>{proof === "" ? "": proof}</div>
+        <div className="App-div">
+          {proof === "" ? "": proof.substring(0, Math.min(proof.length, 48)) + "..."}
+          {proof === "" ? "" : <button onClick={copyProof} className="App-button">Copy proof to clipboard</button>}
+        </div>
       </header>
     </div>
     </>
