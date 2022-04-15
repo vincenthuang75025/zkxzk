@@ -68,9 +68,10 @@ function App() {
             <button onClick={submitHash} className="App-button">Check if proof is ready</button>
           </div>}
         </div>
-        <div className="App-div">
-          {proof === "" ? "": proof.substring(0, Math.min(proof.length, 48)) + "..."}
-          {proof === "" ? "" : <button onClick={copyProof} className="App-button">Copy proof to clipboard</button>}
+        <div className="App-overflow">
+          {proof === "" ? "": proof}
+          {/* {proof === "" ? "": proof.substring(0, Math.min(proof.length, 48)) + "..."} */}
+          {/* {proof === "" ? "" : <button onClick={copyProof} className="App-button">Copy proof to clipboard</button>} */}
         </div>
       </header>
     </div>
