@@ -25,7 +25,8 @@ function App() {
         .then((response) => response.json())
         .then((data) => {
           setId(data.id);
-        });
+        })
+        .catch((error) => alert("Fetch error: Check if your input is formatted currectly."));
     }
   }
 
@@ -47,14 +48,22 @@ function App() {
 
   return (
     <>
-    <div>
-      <h1>Zk Stuff</h1>
-      <div>
-        <input placeholder="BinSub circuit input" type="text" value={input} onChange={handleInputChange}/>
-        <button onClick={submitInput}>Submit Circuit Input</button>
-      </div>
-      <div><button onClick={submitHash}>Submit Hash</button></div>
-      <div>{proof === "" ? "": proof}</div>
+    <div className="App">
+      <header className="App-header">
+        <h1>ZK x ZK</h1>
+        <div>
+          <input placeholder="BinSub circuit input" type="text" value={input} onChange={handleInputChange}/>
+          <button onClick={submitInput}>Submit Verification Job</button>
+        </div>
+        <div className="App-div">
+          {id === "" ? <div/> : 
+          <div className="App-div">
+            <div>Your job ID is {id}. Generating the proof may take a few minutes...</div>
+            <button onClick={submitHash}>Check if proof is ready</button>
+          </div>}
+        </div>
+        <div>{proof === "" ? "": proof}</div>
+      </header>
     </div>
     </>
   );
