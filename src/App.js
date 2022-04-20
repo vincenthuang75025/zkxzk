@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import './App.css';
 import { bigint_to_array, msg_hash } from "./bls.ts";
 
-const backend_url = "http://54.153.52.193:3000/";
+const backend_url = "https://api.zkxzk.xyz/";
 
 /* global BigInt */
 function App() {
