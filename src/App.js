@@ -55,7 +55,7 @@ function App() {
       .then(res => res.json())
       .then(data => setId(data.id))
     })
-    .catch(err => alert("Error: check if your input is formatted correctly."));
+    .catch(err => alert(err));
   }
 
   const submitHash = (event) => {
