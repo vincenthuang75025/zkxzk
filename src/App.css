@@ -31,6 +31,16 @@
   align-items: center;
 }
 
+.App-row {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: start; */
+}
+
+.App-row-element {
+  flex: 1;
+}
+
 .App-link {
   color: #61dafb;
 }
@@ -38,11 +48,13 @@
 .App-button {
   font-size: calc(10px + 2vmin);
   margin: 10px 0px;
+  flex: 1;
 }
 
 .App-input {
   font-size: calc(10px + 2vmin);
   margin: 10px 0px;
+  flex: 1;
 }
 
 .App-overflow {
