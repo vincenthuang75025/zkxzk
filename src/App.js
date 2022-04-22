@@ -8,7 +8,7 @@ const backend_url = "https://api.zkxzk.xyz/";
 function App() {
   const [pubkey, setPubkey] = useState({0: "", 1: ""});
   const [signature, setSignature] = useState({0: "", 1: "", 2: "", 3: ""});
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({0: "", 1: "", 2: "", 3: ""});
   const [id, setId] = useState("");
   const [proof, setProof] = useState("");
 
@@ -24,22 +24,22 @@ function App() {
     setSignature({...signature, [index]: event.target.value});
   }
 
-  const handleMessageChange = (event) => {
-    setMessage(event.target.value);
+  const handleMessageChange = (index, event) => {
+    setMessage({...message, [index]: event.target.value});
   };
 
   const submitInput = (event) => {
-    if (message === "" || pubkey[0] === "" || pubkey[1] === "" || signature[0] === "" || signature[1] === "" || signature[2] === "" || signature[3] === "") {
+    if (message[0] === "" || message[1] === "" || message[2] === "" || message[3] === "" || pubkey[0] === "" || pubkey[1] === "" || signature[0] === "" || signature[1] === "" || signature[2] === "" || signature[3] === "") {
       alert("Please fill in all fields");
       return;
     }
-    msg_hash(message).then(res => {
-      // console.log(JSON.stringify({
-      //   pubkey: [bigint_to_array(55, 7, BigInt(pubkey[0])), bigint_to_array(55, 7, BigInt(pubkey[1]))], 
-      //   signature: [[bigint_to_array(55, 7, BigInt(signature[0])), bigint_to_array(55, 7, BigInt(signature[1]))], 
-      //   [bigint_to_array(55, 7, BigInt(signature[2])), bigint_to_array(55, 7, BigInt(signature[3]))]],  
-      //   hash: res
-      // }));
+    // console.log(JSON.stringify({
+    //   pubkey: [bigint_to_array(55, 7, BigInt(pubkey[0])), bigint_to_array(55, 7, BigInt(pubkey[1]))], 
+    //   signature: [[bigint_to_array(55, 7, BigInt(signature[0])), bigint_to_array(55, 7, BigInt(signature[1]))], 
+    //   [bigint_to_array(55, 7, BigInt(signature[2])), bigint_to_array(55, 7, BigInt(signature[3]))]],  
+    //   hash: [[bigint_to_array(55, 7, BigInt(message[0])), bigint_to_array(55, 7, BigInt(message[1]))], 
+    //   [bigint_to_array(55, 7, BigInt(message[2])), bigint_to_array(55, 7, BigInt(message[3]))]]
+    // }));
       fetch(backend_url + "generate_proof", {
         method: "POST",
         headers: {
@@ -49,13 +49,12 @@ function App() {
           pubkey: [bigint_to_array(55, 7, BigInt(pubkey[0])), bigint_to_array(55, 7, BigInt(pubkey[1]))], 
           signature: [[bigint_to_array(55, 7, BigInt(signature[0])), bigint_to_array(55, 7, BigInt(signature[1]))], 
           [bigint_to_array(55, 7, BigInt(signature[2])), bigint_to_array(55, 7, BigInt(signature[3]))]],  
-          hash: res
+          hash: [[bigint_to_array(55, 7, BigInt(message[0])), bigint_to_array(55, 7, BigInt(message[1]))], 
+          [bigint_to_array(55, 7, BigInt(message[2])), bigint_to_array(55, 7, BigInt(message[3]))]]
         })
       })
       .then(res => res.json())
       .then(data => setId(data.id))
-    })
-    .catch(err => alert(err));
   }
 
   const submitHash = (event) => {
@@ -87,8 +86,8 @@ function App() {
         <h1>ZK x ZK</h1>
         <div>
           <div className="App-row">
-            <input type="text" className="App-input" placeholder="Pubkey (real part)" value={pubkey[0]} onChange={(e) => handlePubkeyChange(0, e)}/>
-            <input type="text" className="App-input" placeholder="Pubkey (imag part)" value={pubkey[1]} onChange={(e) => handlePubkeyChange(1, e)}/>
+            <input type="text" className="App-input" placeholder="Pubkey (x)" value={pubkey[0]} onChange={(e) => handlePubkeyChange(0, e)}/>
+            <input type="text" className="App-input" placeholder="Pubkey (y)" value={pubkey[1]} onChange={(e) => handlePubkeyChange(1, e)}/>
           </div>
           <div className="App-row">
             <input type="text" className="App-input" placeholder="Signature (x, real part)" value={signature[0]} onChange={(e) => handleSignatureChange(0, e)}/>
@@ -97,7 +96,12 @@ function App() {
             <input type="text" className="App-input" placeholder="Signature (y, imag part)" value={signature[3]} onChange={(e) => handleSignatureChange(3, e)}/>
           </div>
           <div className="App-row">
-           <input placeholder="Message" className="App-input" type="text" value={message} onChange={handleMessageChange}/>
+            <input type="text" className="App-input" placeholder="Message (x, real part)" value={message[0]} onChange={(e) => handleMessageChange(0, e)}/>
+            <input type="text" className="App-input" placeholder="Message (x, imag part)" value={message[1]} onChange={(e) => handleMessageChange(1, e)}/>
+            <input type="text" className="App-input" placeholder="Message (y, real part)" value={message[2]} onChange={(e) => handleMessageChange(2, e)}/>
+            <input type="text" className="App-input" placeholder="Message (y, imag part)" value={message[3]} onChange={(e) => handleMessageChange(3, e)}/>
+          </div>
+          <div className="App-row">
            <button onClick={submitInput} className="App-button">Submit Verification Job</button>
           </div>
         </div>
@@ -110,7 +114,9 @@ function App() {
         </div>
         <div className="App-overflow">
           {proof === "" ? "": proof}
-          {/* {proof === "" ? "" : <button onClick={copyProof} className="App-button">Copy proof to clipboard</button>} */}
+        </div>
+        <div>
+        {proof === "" ? "" : <button onClick={copyProof} className="App-button">Copy proof to clipboard</button>}
         </div>
       </header>
     </div>

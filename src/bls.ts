@@ -287,6 +287,7 @@ export async function msg_hash(message: string) {
   let msg = stringToBytes(message);
 
   let u = await hash_to_field(msg, 2);
+  // return u;
 
   return [[bigint_to_array(55, 7, u[0][0]), 
           bigint_to_array(55, 7, u[0][1])],
