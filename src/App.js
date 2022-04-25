@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import './App.css';
 import { bigint_to_array, msg_hash } from "./bls.ts";
+import logo from './logo.svg';
 
 const backend_url = "https://api.zkxzk.xyz/";
 
@@ -118,6 +119,9 @@ function App() {
         <div>
         {proof === "" ? "" : <button onClick={copyProof} className="App-button">Copy proof to clipboard</button>}
         </div>
+        <a href="https://github.com/vincenthuang75025/zkxzk">
+          <img src={logo} className="App-logo" alt="logo" />
+        </a>
       </header>
     </div>
     </>

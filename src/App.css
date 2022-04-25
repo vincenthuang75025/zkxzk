@@ -4,7 +4,7 @@
 }
 
 .App-logo {
-  height: 40vmin;
+  width: 25%;
   pointer-events: none;
 }
 
@@ -60,13 +60,4 @@
 .App-overflow {
   max-width: 100%;
   overflow-wrap: break-word;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
