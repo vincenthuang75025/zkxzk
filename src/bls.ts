@@ -196,7 +196,7 @@ function stringToBytes(str: string) {
 function os2ip(bytes: Uint8Array): bigint {
   let result = 0n;
   for (let i = 0; i < bytes.length; i++) {
-    result <<= 8n;
+    result = result * 256n;
     result += BigInt(bytes[i]);
   }
   return result;
