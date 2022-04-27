@@ -11,7 +11,7 @@
 // We are using Fp for private keys (shorter) and Fp2 for signatures (longer).
 // Some projects may prefer to swap this relation, it is not supported for now.
 
-import nodeCrypto from 'crypto';
+import nodeCrypto from "crypto";
 // prettier-ignore
 
 // To verify curve parameters, see pairing-friendly-curves spec:
@@ -86,7 +86,7 @@ const SHA256_DIGEST_SIZE = 32;
 const htfDefaults = {
   // DST: a domain separation tag
   // defined in section 2.2.5
-  DST: 'BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_NUL_',
+  DST: "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_", // to comply with https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#bls-signatures
   // p: the characteristic of F
   //    where F is a finite field of characteristic p and order q = p^m
   p: CURVE.P,
@@ -105,7 +105,7 @@ const htfDefaults = {
 declare const self: Record<string, any> | undefined;
 const crypto: { node?: any; web?: any } = {
   node: nodeCrypto,
-  web: typeof self === 'object' && 'crypto' in self ? self.crypto : undefined,
+  web: typeof self === "object" && "crypto" in self ? self.crypto : undefined,
 };
 
 export const utils = {
@@ -113,10 +113,12 @@ export const utils = {
   bytesToHex,
   sha256: async (message: Uint8Array): Promise<Uint8Array> => {
     if (crypto.web) {
-      const buffer = await crypto.web.subtle.digest('SHA-256', message.buffer);
+      const buffer = await crypto.web.subtle.digest("SHA-256", message.buffer);
       return new Uint8Array(buffer);
     } else if (crypto.node) {
-      return Uint8Array.from(crypto.node.createHash('sha256').update(message).digest());
+      return Uint8Array.from(
+        crypto.node.createHash("sha256").update(message).digest()
+      );
     } else {
       throw new Error("The environment doesn't have sha256 function");
     }
@@ -124,28 +126,40 @@ export const utils = {
   mod,
 };
 
-const hexes = Array.from({ length: 256 }, (v, i) => i.toString(16).padStart(2, '0'));
-function bytesToHex(uint8a: Uint8Array): string {
+const hexes = Array.from({ length: 256 }, (v, i) =>
+  i.toString(16).padStart(2, "0")
+);
+export function bytesToHex(uint8a: Uint8Array): string {
   // pre-caching chars could speed this up 6x.
-  let hex = '';
+  let hex = "";
   for (let i = 0; i < uint8a.length; i++) {
     hex += hexes[uint8a[i]];
   }
   return hex;
 }
 
-function hexToBytes(hex: string): Uint8Array {
-  if (typeof hex !== 'string') {
-    throw new TypeError('hexToBytes: expected string, got ' + typeof hex);
+export function formatHex(str: string): string {
+  if (str.startsWith("0x")) {
+    str = str.slice(2);
   }
-  if (hex.length % 2) throw new Error('hexToBytes: received invalid unpadded hex');
+  return str;
+}
+
+export function hexToBytes(hex: string): Uint8Array {
+  if (typeof hex !== "string") {
+    throw new TypeError("hexToBytes: expected string, got " + typeof hex);
+  }
+  hex = formatHex(hex);
+  if (hex.length % 2)
+    throw new Error("hexToBytes: received invalid unpadded hex");
   const array = new Uint8Array(hex.length / 2);
   for (let i = 0; i < array.length; i++) {
     const j = i * 2;
     const hexByte = hex.slice(j, j + 2);
-    if (hexByte.length !== 2) throw new Error('Invalid byte sequence');
+    if (hexByte.length !== 2) throw new Error("Invalid byte sequence");
     const byte = Number.parseInt(hexByte, 16);
-    if (Number.isNaN(byte) || byte < 0) throw new Error('Invalid byte sequence');
+    if (Number.isNaN(byte) || byte < 0)
+      throw new Error("Invalid byte sequence");
     array[i] = byte;
   }
   return array;
@@ -221,12 +235,14 @@ async function expand_message_xmd(
   const r_in_bytes = b_in_bytes * 2;
 
   const ell = Math.ceil(lenInBytes / b_in_bytes);
-  if (ell > 255) throw new Error('Invalid xmd length');
+  if (ell > 255) throw new Error("Invalid xmd length");
   const DST_prime = concatBytes(DST, i2osp(DST.length, 1));
   const Z_pad = i2osp(0, r_in_bytes);
   const l_i_b_str = i2osp(lenInBytes, 2);
   const b = new Array<Uint8Array>(ell);
-  const b_0 = await H(concatBytes(Z_pad, msg, l_i_b_str, i2osp(0, 1), DST_prime));
+  const b_0 = await H(
+    concatBytes(Z_pad, msg, l_i_b_str, i2osp(0, 1), DST_prime)
+  );
   b[0] = await H(concatBytes(b_0, i2osp(1, 1), DST_prime));
   for (let i = 1; i <= ell; i++) {
     const args = [strxor(b_0, b[i - 1]), i2osp(i + 1, 1), DST_prime];
@@ -243,7 +259,11 @@ async function expand_message_xmd(
 // count - the number of elements of F to output.
 // Outputs:
 // [u_0, ..., u_(count - 1)], a list of field elements.
-async function hash_to_field(msg: Uint8Array, count: number, options = {}): Promise<bigint[][]> {
+async function hash_to_field(
+  msg: Uint8Array,
+  count: number,
+  options = {}
+): Promise<bigint[][]> {
   // if options is provided but incomplete, fill any missing fields with the
   // value in hftDefaults (ie hash to G2).
   const htfOptions = { ...htfDefaults, ...options };
@@ -270,13 +290,13 @@ async function hash_to_field(msg: Uint8Array, count: number, options = {}): Prom
 
 export function bigint_to_array(n: number, k: number, x: bigint) {
   let mod: bigint = 1n;
-  for (var idx = 0; idx < n; idx++) {
+  for (let idx = 0; idx < n; idx++) {
     mod = mod * 2n;
   }
 
   let ret: string[] = [];
   var x_temp: bigint = x;
-  for (var idx = 0; idx < k; idx++) {
+  for (let idx = 0; idx < k; idx++) {
     ret.push((x_temp % mod).toString());
     x_temp = x_temp / mod;
   }
@@ -289,8 +309,8 @@ export async function msg_hash(message: string) {
   let u = await hash_to_field(msg, 2);
   // return u;
 
-  return [[bigint_to_array(55, 7, u[0][0]), 
-          bigint_to_array(55, 7, u[0][1])],
-          [bigint_to_array(55, 7, u[1][0]), 
-          bigint_to_array(55, 7, u[1][1])]];
+  return [
+    [bigint_to_array(55, 7, u[0][0]), bigint_to_array(55, 7, u[0][1])],
+    [bigint_to_array(55, 7, u[1][0]), bigint_to_array(55, 7, u[1][1])],
+  ];
 }
