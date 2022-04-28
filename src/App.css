@@ -281,3 +281,57 @@ a:hover {
   background-color: var(--shadow-dark);
   color: var(--shadow-color);
 }
+
+.download-contents {
+  background: #7d8293;
+  border-radius: 4px;
+  bottom: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  height: 30px;
+  padding: 5px;
+  position: absolute;
+  right: 25px;
+  text-align: center;
+}
+
+.copy-to-clipboard {
+  background: #7d8293;
+  border: none;
+  border-radius: 4px;
+  bottom: 10px;
+  height: 30px;
+  position: absolute;
+  right: 115px;
+  width: 30px;
+}
+.copy-to-clipboard button {
+  background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" aria-hidden="true"><path fill="%23fff" fill-rule="evenodd" d="M2 13h4v1H2v-1zm5-6H2v1h5V7zm2 3V8l-3 3 3 3v-2h5v-2H9zM4.5 9H2v1h2.5V9zM2 12h2.5v-1H2v1zm9 1h1v2c-.02.28-.11.52-.3.7-.19.18-.42.28-.7.3H1c-.55 0-1-.45-1-1V4c0-.55.45-1 1-1h3c0-1.11.89-2 2-2 1.11 0 2 .89 2 2h3c.55 0 1 .45 1 1v5h-1V6H1v9h10v-2zM2 5h8c0-.55-.45-1-1-1H8c-.55 0-1-.45-1-1s-.45-1-1-1-1 .45-1 1-.45 1-1 1H3c-.55 0-1 .45-1 1z"/></svg>')
+    50% no-repeat;
+  border: none;
+  height: 25px;
+  padding-left: 25px;
+  cursor: pointer;
+}
+pre {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: rgb(51, 51, 51) none repeat scroll 0% 0%;
+  color: white;
+  word-wrap: break-word;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 600;
+  hyphens: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 400px;
+  min-height: 6em;
+  overflow-y: auto;
+}

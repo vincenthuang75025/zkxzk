@@ -1,6 +1,6 @@
 import { PointG1, PointG2 } from "@noble/bls12-381";
 import { ssz } from "@chainsafe/lodestar-types";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, WheelEvent } from "react";
 import "./App.css";
 import {
   bigint_to_array,
@@ -10,13 +10,40 @@ import {
   bytesToHex,
 } from "./bls";
 import { ReactComponent as Logo } from "./logo.svg";
+import saveAs from "js-file-download";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const hashToField = utils.hashToField;
 
 const backend_url = "https://api.zkxzk.xyz/";
 
+const PrettyPrintJson: React.FC<{
+  data: string;
+  fileName?: string;
+}> = ({ data, fileName }) => {
+  const downloadText = () => {
+    saveAs(data, fileName || "response.txt");
+  };
+
+  // (destructured) data could be a prop for example
+  return (
+    <div>
+      <h5>{fileName}</h5>
+      <div className="download-contents" onClick={downloadText}>
+        Download
+      </div>
+      <div className="copy-to-clipboard">
+        <CopyToClipboard text={data}>
+          <button></button>
+        </CopyToClipboard>
+      </div>
+      <pre>{data}</pre>
+    </div>
+  );
+};
+
 /* global BigInt */
-function App() {
+function App(): JSX.Element {
   const [slot, setSlot] = useState("");
   const [epoch, setEpoch] = useState("");
   const [pubkeyHex, setPubkeyHex] = useState("");
@@ -176,33 +203,51 @@ function App() {
     //   hash: [[bigint_to_array(55, 7, BigInt(message[0])), bigint_to_array(55, 7, BigInt(message[1]))],
     //   [bigint_to_array(55, 7, BigInt(message[2])), bigint_to_array(55, 7, BigInt(message[3]))]]
     // }));
-    let inputStr: string = JSON.stringify({
-      pubkey: [
-        bigint_to_array(55, 7, BigInt(pubkey[0])),
-        bigint_to_array(55, 7, BigInt(pubkey[1])),
+    let pubkeyArray: string[][] = [
+      bigint_to_array(55, 7, BigInt(pubkey[0])),
+      bigint_to_array(55, 7, BigInt(pubkey[1])),
+    ];
+    let signatureArray: string[][][] = [
+      [
+        bigint_to_array(55, 7, BigInt(signature[0])),
+        bigint_to_array(55, 7, BigInt(signature[1])),
       ],
-      signature: [
-        [
-          bigint_to_array(55, 7, BigInt(signature[0])),
-          bigint_to_array(55, 7, BigInt(signature[1])),
-        ],
-        [
-          bigint_to_array(55, 7, BigInt(signature[2])),
-          bigint_to_array(55, 7, BigInt(signature[3])),
-        ],
+      [
+        bigint_to_array(55, 7, BigInt(signature[2])),
+        bigint_to_array(55, 7, BigInt(signature[3])),
       ],
-      hash: [
-        [
-          bigint_to_array(55, 7, BigInt(message[0])),
-          bigint_to_array(55, 7, BigInt(message[1])),
-        ],
-        [
-          bigint_to_array(55, 7, BigInt(message[2])),
-          bigint_to_array(55, 7, BigInt(message[3])),
-        ],
+    ];
+    let hashArray: string[][][] = [
+      [
+        bigint_to_array(55, 7, BigInt(message[0])),
+        bigint_to_array(55, 7, BigInt(message[1])),
       ],
-    });
+      [
+        bigint_to_array(55, 7, BigInt(message[2])),
+        bigint_to_array(55, 7, BigInt(message[3])),
+      ],
+    ];
+    let inputStr: string = JSON.stringify(
+      {
+        pubkey: pubkeyArray,
+        signature: signatureArray,
+        hash: hashArray,
+      },
+      null,
+      2
+    );
     setInputJson(inputStr);
+
+    let publicArray: string[] = [];
+    publicArray = publicArray.concat(
+      pubkeyArray.flat(),
+      signatureArray[0].flat(),
+      signatureArray[1].flat(),
+      hashArray[0].flat(),
+      hashArray[1].flat()
+    );
+    setPublicJson(JSON.stringify(publicArray));
+
     setProof("");
 
     fetch(backend_url + "generate_proof", {
@@ -227,14 +272,8 @@ function App() {
       })
         .then((response) => response.json())
         .then((data) => {
-          setProof(JSON.stringify(data));
+          setProof(JSON.stringify(data, null, 2));
         });
-    }
-  };
-
-  const copyProof = (event: any) => {
-    if (proof !== "") {
-      navigator.clipboard.writeText(proof);
     }
   };
 
@@ -545,63 +584,54 @@ function App() {
                   </button>
                 </div>
               </div>
-            </div>
-            {id === "" ? (
-              <div />
-            ) : (
-              <>
-                <div className="row border-bottom p-3 mx-0">
-                  <div className="col-md-12">
-                    <h5>input.json: </h5>
-                    <div className="col-input">
-                      <textarea
-                        className="App-input"
-                        rows={20}
-                        value={inputJson}
+              {id === "" ? (
+                <div />
+              ) : (
+                <>
+                  <div className="row border-bottom p-3 mx-0">
+                    <div className="col-md-12">
+                      <PrettyPrintJson
+                        fileName={"input.json"}
+                        data={inputJson}
                       />
                     </div>
                   </div>
-                </div>
-                <div className="row border-bottom p-3 mx-0">
-                  <div className="col-md-12">
-                    Your job ID is {id}. Generating the proof may take a few
-                    minutes...
+                  <div className="row border-bottom p-3 mx-0">
+                    <div className="col-md-12">
+                      Your job ID is {id}. Generating the proof may take a few
+                      minutes...
+                    </div>
                   </div>
-                </div>
-                <div className="border-bottom">
-                  <div className="col-button">
-                    <button onClick={submitHash} className="App-button">
-                      Check if proof is ready
-                    </button>
+                  <div className="border-bottom">
+                    <div className="col-button">
+                      <button onClick={submitHash} className="App-button">
+                        Check if proof is ready
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
-            {proof === "" ? (
-              ""
-            ) : (
-              <div className="row border-bottom p-3 mx-0">
-                <div className="col-md-12">
-                  <h5>proof.json: </h5>
-                  <div className="col-input">
-                    <textarea className="App-input" rows={10} value={proof} />
-                  </div>
-                </div>
-              </div>
-            )}
-            <div>
+                </>
+              )}
               {proof === "" ? (
                 ""
               ) : (
-                <button onClick={copyProof} className="App-button">
-                  Copy proof to clipboard
-                </button>
+                <div className="row p-3 mx-0" style={{ marginBottom: "2rem" }}>
+                  <div className="col-md-12">
+                    <PrettyPrintJson
+                      fileName={"public.json"}
+                      data={publicJson}
+                    />
+                  </div>
+                  <div className="col-md-12">
+                    <PrettyPrintJson fileName={"proof.json"} data={proof} />
+                  </div>
+                </div>
               )}
             </div>
           </div>
         </div>
+
         <a href="https://github.com/vincenthuang75025/zkxzk">
-          <Logo fill="#ffffff" width="2rem" />
+          <Logo width="2rem" />
         </a>
       </div>
     </>
