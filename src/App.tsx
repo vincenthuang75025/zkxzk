@@ -12,6 +12,7 @@ import {
 import { ReactComponent as Logo } from "./logo.svg";
 import saveAs from "js-file-download";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import vkey from "./vkey.json";
 
 const hashToField = utils.hashToField;
 
@@ -614,7 +615,14 @@ function App(): JSX.Element {
               {proof === "" ? (
                 ""
               ) : (
-                <div className="row p-3 mx-0" style={{ marginBottom: "2rem" }}>
+                <div className="row p-3 mx-0">
+                  <div className="col-md-12">Your proof is ready!</div>
+                  <div className="col-md-12">
+                    <PrettyPrintJson
+                      fileName={"vkey.json"}
+                      data={JSON.stringify(vkey, null, 2)}
+                    />
+                  </div>
                   <div className="col-md-12">
                     <PrettyPrintJson
                       fileName={"public.json"}
@@ -623,6 +631,29 @@ function App(): JSX.Element {
                   </div>
                   <div className="col-md-12">
                     <PrettyPrintJson fileName={"proof.json"} data={proof} />
+                  </div>
+                  <div
+                    style={{
+                      paddingTop: "2rem",
+                      paddingRight: "15px",
+                      paddingLeft: "15px",
+                      width: "100%",
+                      position: "relative",
+                    }}
+                  >
+                    To verify locally, install{" "}
+                    <a href="https://github.com/iden3/snarkjs">snarkjs</a>,
+                    download the three files above, and run:
+                    <div
+                      style={{
+                        marginTop: "1rem",
+                        marginBottom: "2rem",
+                      }}
+                    >
+                      <pre>
+                        snarkjs groth16 verify vkey.json public.json proof.json
+                      </pre>
+                    </div>
                   </div>
                 </div>
               )}
