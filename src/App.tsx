@@ -12,6 +12,7 @@ import {
 import { ReactComponent as Logo } from "./logo.svg";
 import saveAs from "js-file-download";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+// @ts-ignore
 import vkey from "./vkey.json";
 
 const hashToField = utils.hashToField;
@@ -282,7 +283,7 @@ function App(): JSX.Element {
     <>
       <div className="App">
         <header className="App-header"></header>
-        <h1>ZK x ZK</h1>
+        <h1>zkPairing</h1>
         <div className="container mt-2">
           <div className="card block-card">
             <div className="card-body px-0 py-1">
