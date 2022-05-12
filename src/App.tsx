@@ -622,47 +622,63 @@ function App(): JSX.Element {
               {status === 0 ? (
                 ""
               ) : status === 200 ? (
-                <div className="row p-3 mx-0">
-                  <div className="col-md-12">Your proof is ready!</div>
-                  <div className="col-md-12">
-                    <PrettyPrintJson
-                      fileName={"vkey.json"}
-                      data={JSON.stringify(vkey, null, 2)}
-                    />
-                  </div>
-                  <div className="col-md-12">
-                    <PrettyPrintJson
-                      fileName={"public.json"}
-                      data={publicJson}
-                    />
-                  </div>
-                  <div className="col-md-12">
-                    <PrettyPrintJson fileName={"proof.json"} data={proof} />
-                  </div>
-                  <div
-                    style={{
-                      paddingTop: "2rem",
-                      paddingRight: "15px",
-                      paddingLeft: "15px",
-                      width: "100%",
-                      position: "relative",
-                    }}
-                  >
-                    To verify locally, install{" "}
-                    <a href="https://github.com/iden3/snarkjs">snarkjs</a>,
-                    download the three files above, and run:
-                    <div
-                      style={{
-                        marginTop: "1rem",
-                        marginBottom: "2rem",
-                      }}
-                    >
-                      <pre>
-                        snarkjs groth16 verify vkey.json public.json proof.json
-                      </pre>
+                proof ===
+                JSON.stringify(
+                  JSON.parse(
+                    '{"result": "BLS signature verification failed."}'
+                  ),
+                  null,
+                  2
+                ) ? (
+                  <div className="row p-3 mx-0">
+                    <div className="col-md-12">
+                      BLS signature verification failed.
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="row p-3 mx-0">
+                    <div className="col-md-12">Your proof is ready!</div>
+                    <div className="col-md-12">
+                      <PrettyPrintJson
+                        fileName={"vkey.json"}
+                        data={JSON.stringify(vkey, null, 2)}
+                      />
+                    </div>
+                    <div className="col-md-12">
+                      <PrettyPrintJson
+                        fileName={"public.json"}
+                        data={publicJson}
+                      />
+                    </div>
+                    <div className="col-md-12">
+                      <PrettyPrintJson fileName={"proof.json"} data={proof} />
+                    </div>
+                    <div
+                      style={{
+                        paddingTop: "2rem",
+                        paddingRight: "15px",
+                        paddingLeft: "15px",
+                        width: "100%",
+                        position: "relative",
+                      }}
+                    >
+                      To verify locally, install{" "}
+                      <a href="https://github.com/iden3/snarkjs">snarkjs</a>,
+                      download the three files above, and run:
+                      <div
+                        style={{
+                          marginTop: "1rem",
+                          marginBottom: "2rem",
+                        }}
+                      >
+                        <pre>
+                          snarkjs groth16 verify vkey.json public.json
+                          proof.json
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                )
               ) : status === 400 ? (
                 <div className="row p-3 mx-0">
                   <div className="col-md-12">Process still running. </div>
@@ -670,8 +686,7 @@ function App(): JSX.Element {
               ) : (
                 <div className="row p-3 mx-0">
                   <div className="col-md-12">
-                    There was an error during proof generation. Please check
-                    inputs and try again.
+                    Unknown error occured. Please check inputs and try again.
                   </div>
                 </div>
               )}
