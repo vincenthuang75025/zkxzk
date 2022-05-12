@@ -60,6 +60,7 @@ function App(): JSX.Element {
   const [inputJson, setInputJson] = useState("");
   const [publicJson, setPublicJson] = useState("");
   const [proof, setProof] = useState("");
+  const [status, setStatus] = useState(0);
 
   /*useEffect(() => {
     msg_hash("abc").then(res => console.log(res));
@@ -251,6 +252,7 @@ function App(): JSX.Element {
     setPublicJson(JSON.stringify(publicArray));
 
     setProof("");
+    setStatus(0);
 
     fetch(backend_url + "generate_proof", {
       method: "POST",
@@ -272,7 +274,11 @@ function App(): JSX.Element {
         },
         body: '{"id":"' + id + '"}',
       })
-        .then((response) => response.json())
+        .then((response) => {
+          setStatus(response.status);
+          console.log(response.status);
+          return response.json();
+        })
         .then((data) => {
           setProof(JSON.stringify(data, null, 2));
         });
@@ -613,9 +619,9 @@ function App(): JSX.Element {
                   </div>
                 </>
               )}
-              {proof === "" ? (
+              {status === 0 ? (
                 ""
-              ) : (
+              ) : status === 200 ? (
                 <div className="row p-3 mx-0">
                   <div className="col-md-12">Your proof is ready!</div>
                   <div className="col-md-12">
@@ -655,6 +661,17 @@ function App(): JSX.Element {
                         snarkjs groth16 verify vkey.json public.json proof.json
                       </pre>
                     </div>
+                  </div>
+                </div>
+              ) : status === 400 ? (
+                <div className="row p-3 mx-0">
+                  <div className="col-md-12">Process still running. </div>
+                </div>
+              ) : (
+                <div className="row p-3 mx-0">
+                  <div className="col-md-12">
+                    There was an error during proof generation. Please check
+                    inputs and try again.
                   </div>
                 </div>
               )}
